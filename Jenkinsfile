@@ -29,8 +29,16 @@ pipeline {
                 echo 'Deploying....'
                 sh 'sudo docker stop $CONTAINER_NAME || true'
                 sh 'sudo docker rm $CONTAINER_NAME || true'
-                sh 'sudo docker run -d -p 5001:5000 --name $CONTAINER_NAME $IMAGE_NAME'
+                sh 'sudo docker run -d -p 5000:5000 --name $CONTAINER_NAME $IMAGE_NAME'
             }
         }
     }
+    post {  
+         always {  
+             echo 'Microblog is running ...'  
+         }  
+         success {  
+             echo 'Microblog is running successfully ...'  
+         }  
+     }  
 }
