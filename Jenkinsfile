@@ -37,9 +37,13 @@ pipeline {
          always {  
              echo 'Microblog is running ...'  
          }  
-         success {  
-             echo 'Microblog is running successfully ...'  
-         }
+         Succes{
+        echo "Build completed Successfully"
+        sh "curl -X POST -H 'Content-type: application/json' --data 
+            '{\"text\":\"The job ${env.JOB_NAME} with build number
+            ${env.BUILD_NUMBER} completed\"}' https://hooks.slack.com/services/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"
+      
+	}
         failure {
     echo "Build Failed!"
     sh "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"The job ${env.JOB_NAME} with build number ${env.BUILD_NUMBER} failed. \
@@ -48,4 +52,5 @@ pipeline {
 
 
      }  
+   
 }
