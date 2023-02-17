@@ -30,9 +30,11 @@ pipeline {
              }
          }
      
-   post {
-        failure {
-            mail to: "ikram2121ali@gmail.com", subject: 'Failed Deployment', body: "${env.BUILD_URL}"
-        }
+  post {
+    failure {
+        emailext body: "Deployment of ${env.JOB_NAME} failed. Build URL: ${env.BUILD_URL}", 
+                 subject: "Failed Deployment: ${env.JOB_NAME}", 
+                 to: "ikram2121ali@gmail.com"
     }
-}
+ }
+ }
