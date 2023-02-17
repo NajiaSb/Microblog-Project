@@ -39,6 +39,12 @@ pipeline {
          }  
          success {  
              echo 'Microblog is running successfully ...'  
-         }  
+         }
+         failure {
+             echo 'Microblog failed to run successfully ...' 
+             emailext body: "Deployment of ${env.JOB_NAME} failed. Build URL: ${env.BUILD_URL}", 
+                 subject: "Failed Deployment: ${env.JOB_NAME}", 
+                 to: "ikram2121ali@gmail.com"
+         }
      }  
 }
