@@ -31,14 +31,4 @@ pipeline {
                  sh 'sudo docker run -d -p 5000:5000 --name $CONTAINER_NAME $IMAGE_NAME'
              }
          }
-     
-
-     
-  post {
-    failure {
-        emailext body: "Deployment of ${env.JOB_NAME} failed. Build URL: ${env.BUILD_URL}", 
-                 subject: "Failed Deployment: ${env.JOB_NAME}", 
-                 to: "ikram2121ali@gmail.com"
-    }
- }
  }
