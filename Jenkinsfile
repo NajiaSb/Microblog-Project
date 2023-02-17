@@ -33,4 +33,9 @@ pipeline {
             }
         }
     }
+    post {
+        failure {
+            mail to: ‘ikram2121ali@gmail.com', subject: 'Failed Deployment', body: "${env.BUILD_URL}"
+        }
+    }
 }
