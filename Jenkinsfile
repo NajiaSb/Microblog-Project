@@ -40,11 +40,11 @@ pipeline {
          success {  
              echo 'Microblog is running successfully ...'  
          }
-         failure {
-             echo 'Microblog failed to run successfully ...' 
-             emailext body: "Deployment of ${env.JOB_NAME} failed. Build URL: ${env.BUILD_URL}", 
-                 subject: "Failed Deployment: ${env.JOB_NAME}", 
-                 to: "ikram2121ali@gmail.com"
-         }
+        failure {
+    echo "Build Failed!"
+    sh "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"The job ${env.JOB_NAME} with build number ${env.BUILD_NUMBER} failed. 
+            See ${env.BUILD_URL} for details.\"}' https://hooks.slack.com/services/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"
+}
+
      }  
 }
