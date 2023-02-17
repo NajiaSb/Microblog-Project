@@ -14,12 +14,12 @@ pipeline {
                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url:'git@github.com:NajiaSb/Microblog-Project.git']]])
            }
        }
-        stage('Build') {
-            steps {
-                echo 'Building..'
-                sh 'sudo docker build --tag $IMAGE_NAME .'
-            }
-        }
+       stage('Build') {
+           steps {
+               echo 'Building..'
+               sh 'sudo docker build --tag $IMAGE_NAME . --invalid-option' // intentionally introduce an error
+           }
+       }
         stage('Test') {
             steps {
                 echo 'Testing..'
