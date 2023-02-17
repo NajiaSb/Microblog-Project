@@ -30,11 +30,9 @@ pipeline {
              }
          }
      
-    post {
+   post {
         failure {
-            mail to: "ikram2121ali@gmail.com, groupmember1@example.com, groupmember2@example.com", 
-                 subject: "Failed Deployment", 
-                 body: "${env.BUILD_URL}"
+            mail to: ‘ikram2121ali@gmail.com', subject: 'Failed Deployment', body: "${env.BUILD_URL}"
         }
     }
 }
