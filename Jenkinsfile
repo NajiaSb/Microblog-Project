@@ -5,6 +5,7 @@ pipeline {
        IMAGE_NAME = "microblogapp"
        JOB_NAME = "Microblog App"
        BUILD_URL = "http://54.173.6.81:5000/"
+       DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1076229305052430436/46G6PCsNJO0Lq_OHYu07sC9bN3cmap36ivAJ89DpiwOnSOJZzrmZQNdbvb8_WcmvvduS"
     }
 
     stages {
@@ -33,21 +34,21 @@ pipeline {
             }
         }
     }
-    post {  
-         always {  
-             echo 'Microblog is running ...'  
-         }  
-        success {  
-              echo 'Microblog is running successfully ...'  
-          }  
-          
-        failure {
-    echo "Build Failed!"
-    sh "curl -X POST -H 'Content-type: application/json' --data '{\"text\":\"The job ${env.JOB_NAME} with build number ${env.BUILD_NUMBER} failed. \
-    See ${env.BUILD_URL} for details.\"}' https://hooks.slack.com/services/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"
-}
+    post {
+         always {
+             echo 'Microblog is running ...'
+         }
+        success {
+              echo 'Microblog is running successfully ...'
+          }
+
+          failure {
+            echo "Build Failed!"
+            sh "curl -X POST -H 'Content-type: application/json' --data '{\"content\":\"The job ${env.JOB_NAME} with build number ${env.BUILD_NUMBER} failed. \
+            See ${env.BUILD_URL} for details.\"}' $DISCORD_WEBHOOK_URL"
+          }
 
 
-     }  
-   
+     }
+
 }
