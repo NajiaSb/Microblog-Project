@@ -14,11 +14,11 @@ pipeline {
             }
         }
          stage('Build') {
-             steps {
-                 echo 'Building..'
-                 sh 'sudo docker build --tag $IMAGE_NAME .'
-             }
-         }
+    steps {
+        echo 'Building..'
+        sh 'invalid-command'
+    }
+}
          stage('Test') {
  @@ -15,6 +27,9 @@ pipeline {
          stage('Deploy') {
