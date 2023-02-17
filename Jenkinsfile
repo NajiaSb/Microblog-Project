@@ -17,7 +17,7 @@ pipeline {
        stage('Build') {
            steps {
                echo 'Building..'
-               sh 'sudo docker build --tag $IMAGE_NAME . --invalid-option' // intentionally introduce an error
+               sh 'sudo docker build --tag $IMAGE_NAME .'
            }
        }
         stage('Test') {
