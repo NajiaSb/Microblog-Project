@@ -39,8 +39,8 @@ def register():
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data,
-                    mfa_secret_key=form.mfa_secret_key.data)  #saving the key from the field to that database
+        user = User(username=form.username.data, email=form.email.data)
+        user.mfa_secret_key = pyotp.random_base32() #generating a new secret key
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
