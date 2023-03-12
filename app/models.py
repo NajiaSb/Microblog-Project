@@ -123,8 +123,8 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     # definitions for mfa
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
-        if self.mfa_token is None:
-            self.mfa_token = base64.b32encode(os.urandom(10)).decode('utf-8')
+        if self.mfa_secret_key is None:
+            self.mfa_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
     
     def get_totp_uri(self):
         return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo' \
