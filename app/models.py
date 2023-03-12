@@ -12,7 +12,7 @@ import redis
 import rq
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
-
+import onetimepass
 
 class SearchableMixin(object):
     @classmethod
@@ -94,6 +94,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    mfa_token = db.Column(db.String(16)) #new database column for mfa
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
@@ -117,6 +118,19 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+    
+    # definitions for mfa
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.mfa_token is None:
+            self.mfa_token = base64.b32encode(os.urandom(10)).decode('utf-8')
+    
+    def get_totp_uri(self):
+        return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo' \
+            .format(self.username, self.mfa_token)
+
+    def verify_totp(self, token):
+        return onetimepass.valid_totp(token, self.mfa_token)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
