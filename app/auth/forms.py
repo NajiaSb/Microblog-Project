@@ -8,7 +8,8 @@ from app.models import User
 class LoginForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired()])
     password = PasswordField(_l('Password'), validators=[DataRequired()])
-    token = StringField('Token', validators=[DataRequired(), Length(6, 6)])
+    mfa_secret_key = StringField(_l('Google Authenticator Token'),
+                            validators=[DataRequired(), Length(min=6, max=6)]) #length of 6 because thats is token len
     remember_me = BooleanField(_l('Remember Me'))
     submit = SubmitField(_l('Sign In'))
 

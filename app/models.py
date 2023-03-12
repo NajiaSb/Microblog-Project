@@ -94,7 +94,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    mfa_token = db.Column(db.String(16)) #new database column for mfa
+    #mfa_token = db.Column(db.String(16)) #new database column for mfa
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
@@ -115,6 +115,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    mfa_secret_key = db.Column(db.String(16)) #field for key
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

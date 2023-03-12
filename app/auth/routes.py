@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, url_for, flash, request, session
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user
 from flask_babel import _
@@ -8,6 +8,7 @@ from app.auth.forms import LoginForm, RegistrationForm, \
     ResetPasswordRequestForm, ResetPasswordForm
 from app.models import User
 from app.auth.email import send_password_reset_email
+import pyotp
 
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -21,11 +22,9 @@ def login():
             flash(_('Invalid username or password'))
             return redirect(url_for('auth.login'))
         login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('main.index')
-        return redirect(next_page)
-    return render_template('auth/login.html', title=_('Sign In'), form=form)
+        session['mfa_required'] = True  # Set MFA flag in session
+        return redirect('auth.mfa')
+    return render_template('auth/login.html', title='Sign In', form=form)
 
 
 @bp.route('/logout')
@@ -40,7 +39,8 @@ def register():
         return redirect(url_for('main.index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
+        user = User(username=form.username.data, email=form.email.data,
+                    mfa_secret_key=form.mfa_secret_key.data)  #saving the key from the field to that database
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -80,3 +80,20 @@ def reset_password(token):
         flash(_('Your password has been reset.'))
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
+
+@bp.route('/mfa', methods=['GET', 'POST'])
+def mfa():
+    if not current_user.is_authenticated:
+        return redirect(url_for('auth.login'))
+    if not session.get('mfa_required', False):
+        return redirect(url_for('main.index'))
+    user_secret = current_user.get_mfa_secret()
+    totp = pyotp.TOTP(user_secret)
+    if request.method == 'POST':
+        if totp.verify(request.form['mfa_token']):
+            session.pop('mfa_required', None)
+            return redirect(request.args.get('next') or url_for('main.index'))
+        else:
+            flash('Invalid MFA token')
+        qr_code = totp.provisioning_uri(current_user.email)
+        return render_template('auth/mfa.html', qr_code=qr_code)
