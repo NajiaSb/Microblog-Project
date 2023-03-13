@@ -5,7 +5,6 @@ from flask_babel import _, lazy_gettext as _l
 from app.models import User
 
 
-
 class LoginForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired()])
     password = PasswordField(_l('Password'), validators=[DataRequired()])
@@ -45,4 +44,3 @@ class ResetPasswordForm(FlaskForm):
         _l('Repeat Password'), validators=[DataRequired(),
                                            EqualTo('password')])
     submit = SubmitField(_l('Request Password Reset'))
-
