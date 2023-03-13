@@ -11,7 +11,6 @@ from app.models import User, Post, Message, Notification
 from werkzeug.utils import secure_filename
 from app.translate import translate
 from app.main import bp
-from app.models import User
 
 
 @bp.before_app_request

@@ -14,7 +14,6 @@ import secrets
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
 
-
 class SearchableMixin(object):
     @classmethod
     def search(cls, expression, page, per_page):
@@ -82,13 +81,11 @@ class PaginatedAPIMixin(object):
         }
         return data
 
-
 followers = db.Table(
     'followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
-
 
 class User(UserMixin, PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -100,6 +97,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
+    profile_picture = db.Column(db.String(140))
     followed = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -115,7 +113,8 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
-
+    otp_secret = db.Column(db.String(16))
+  
     def __repr__(self):
         return '<User {}>'.format(self.username)
 
