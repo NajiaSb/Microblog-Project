@@ -10,6 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import redis
 import rq
+import secrets
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
 
@@ -123,6 +124,14 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    def save_profile_picture(form_picture):
+        random_hex = secrets.token_hex(8)
+        _, f_ext = os.path.splitext(form_picture.filename)
+        picture_fn = random_hex + f_ext
+        picture_path = os.path.join(current_app.root_path, 'static/profile_pictures', picture_fn)
+        form_picture.save(picture_path)
+        return picture_fn
 
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()

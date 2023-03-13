@@ -8,8 +8,10 @@ from app import db
 from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
     MessageForm
 from app.models import User, Post, Message, Notification
+from werkzeug.utils import secure_filename
 from app.translate import translate
 from app.main import bp
+from app.models import User
 
 
 @bp.before_app_request
@@ -98,6 +100,12 @@ def edit_profile():
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
+        if form.profile_picture.data:
+            # handle file upload and store in database
+            file = form.profile_picture.data
+            filename = secure_filename(file.filename)
+            file_data = file.read()
+
         db.session.commit()
         flash(_('Your changes have been saved.'))
         return redirect(url_for('main.edit_profile'))
