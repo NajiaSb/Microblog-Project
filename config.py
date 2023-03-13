@@ -1,5 +1,7 @@
 import os
 from dotenv import load_dotenv
+SECRET_KEY = 'top-secret'
+SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///db.sqlite')
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))

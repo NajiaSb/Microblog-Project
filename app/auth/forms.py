@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Required
 from flask_babel import _, lazy_gettext as _l
 from app.models import User
 import pyotp
@@ -10,9 +10,7 @@ import qrcode
 class LoginForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired()])
     password = PasswordField(_l('Password'), validators=[DataRequired()])
-    mfa_secret_key = StringField(_l('Google Authenticator Token'),
-                                 validators=[DataRequired(),
-                                             Length(min=6, max=6)])  # length of 6 because thats is token len
+    token = StringField('Token', validators=[Required(), Length(6, 6)])  #to enter the token
     remember_me = BooleanField(_l('Remember Me'))
     submit = SubmitField(_l('Sign In'))
 
