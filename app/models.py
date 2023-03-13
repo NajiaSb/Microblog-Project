@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from hashlib import md5
 import json
 import os
+import io
 from time import time
 from flask import current_app, url_for
 from flask_login import UserMixin
@@ -97,7 +98,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
-    profile_picture = db.Column(db.String(140))
+    profile_picture = db.Column(db.String(140), default='default.jpg')
     followed = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -124,14 +125,20 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
-    def save_profile_picture(form_picture):
+    # new function to save pfp
+    def save_profile_picture(self, form_picture):
         random_hex = secrets.token_hex(8)
         _, f_ext = os.path.splitext(form_picture.filename)
         picture_fn = random_hex + f_ext
         picture_path = os.path.join(current_app.root_path, 'static/profile_pictures', picture_fn)
         form_picture.save(picture_path)
         return picture_fn
-
+    
+    def get_profile_picture(self):
+        picture_path = os.path.join('../static/profile_pictures', self.profile_picture)
+        return picture_path
+    
+    # will be replaced later
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
@@ -217,7 +224,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
         return data
 
     def from_dict(self, data, new_user=False):
-        for field in ['username', 'email', 'about_me']:
+        for field in ['username', 'email', 'about_me', 'profile_picture']:
             if field in data:
                 setattr(self, field, data[field])
         if new_user and 'password' in data:
