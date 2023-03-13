@@ -125,34 +125,26 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
             # generate a random secret
             self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
 
-    def __repr__(self):
-        return '<User {}>'.format(self.username)
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
 
-    # definitions for mfa
-    # def __init__(self, **kwargs):
-    #    super(User, self).__init__(**kwargs)
-    #   self.mfa_enabled = None
-
-    #   def get_totp_uri(self):
-    #      return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo' \
-    #         .format(self.username, self.mfa_token)
-
-    # def verify_totp(self, token):
-    #   return onetimepass.valid_totp(token, self.mfa_token)
-
+    @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    # definitions for MFA
     def get_totp_uri(self):
         return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo' \
             .format(self.username, self.otp_secret)
 
     def verify_totp(self, token):
         return onetimepass.valid_totp(token, self.otp_secret)
+
+    def __repr__(self):
+        return '<User {}>'.format(self.username)
 
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
