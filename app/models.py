@@ -14,6 +14,7 @@ import rq
 import secrets
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
+from os.path import join, dirname, realpath
 
 class SearchableMixin(object):
     @classmethod
@@ -126,23 +127,23 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
         return check_password_hash(self.password_hash, password)
     
     # new function to save pfp
-    def save_profile_picture(self, form_picture):
-        random_hex = secrets.token_hex(8)
-        _, f_ext = os.path.splitext(form_picture.filename)
-        picture_fn = random_hex + f_ext
-        picture_path = os.path.join(current_app.root_path, 'static/profile_pictures', picture_fn)
-        form_picture.save(picture_path)
-        return picture_fn
+    def save_profile_picture(self, pic_data):
+        new_image_name = self.username + ".jpg"
+        UPLOADS_PATH = join(dirname(realpath(__file__)), 'static/profile_pictures')
+        picture_path = join(UPLOADS_PATH, new_image_name)
+
+        if not os.path.exists(UPLOADS_PATH):
+                os.makedirs(UPLOADS_PATH)
+
+        with open(picture_path, "wb") as f:
+            f.write(pic_data)
+        self.profile_picture = new_image_name
+        return True
     
     def get_profile_picture(self):
         picture_path = os.path.join('../static/profile_pictures', self.profile_picture)
         return picture_path
     
-    # will be replaced later
-    def avatar(self, size):
-        digest = md5(self.email.lower().encode('utf-8')).hexdigest()
-        return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
-            digest, size)
 
     def follow(self, user):
         if not self.is_following(user):
