@@ -1,9 +1,10 @@
 import pyqrcode
 from flask import render_template, redirect, url_for, flash, request, session, app, abort
+from flask_mail import Message
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_babel import _
-from app import db
+from app import db, mail
 from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm, \
     ResetPasswordRequestForm, ResetPasswordForm
@@ -59,7 +60,7 @@ def register():
             flash('Username already exists.')
             return redirect(url_for('auth.register'))
         # add new user to the database
-        user = User(username=form.username.data, password=form.password.data)
+        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
         db.session.add(user)
         db.session.commit()
 
@@ -114,9 +115,23 @@ def reset_password_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            send_password_reset_email(user)
-        flash(
-            _('Check your email for the instructions to reset your password'))
+            # generate a token for the password reset link
+            token = user.get_reset_password_token()
+
+            # compose the email message
+            msg = Message('Reset Your Password', recipients=[user.email])
+            msg.body = f'''To reset your password, click on the following link:
+{url_for('auth.reset_password', token=token, _external=True)}
+
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+
+            # send the email
+            mail.send(msg)
+
+            flash(_('Check your email for the instructions to reset your password'))
+        else:
+            flash(_('Invalid email address'))
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password_request.html',
                            title=_('Reset Password'), form=form)

@@ -14,7 +14,6 @@ from redis import Redis
 import rq
 from config import Config
 from flask_wtf.csrf import CSRFProtect
-
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
