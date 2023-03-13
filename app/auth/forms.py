@@ -3,14 +3,13 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Hidde
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Required
 from flask_babel import _, lazy_gettext as _l
 from app.models import User
-import pyotp
-import qrcode
+
 
 
 class LoginForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired()])
     password = PasswordField(_l('Password'), validators=[DataRequired()])
-    token = StringField('Token', validators=[Required(), Length(6, 6)])  #to enter the token
+    token = StringField('Token', validators=[Required(), Length(6, 6)])  # to enter the token
     remember_me = BooleanField(_l('Remember Me'))
     submit = SubmitField(_l('Sign In'))
 
@@ -46,12 +45,4 @@ class ResetPasswordForm(FlaskForm):
         _l('Repeat Password'), validators=[DataRequired(),
                                            EqualTo('password')])
     submit = SubmitField(_l('Request Password Reset'))
-
-
-class MFAForm(FlaskForm):
-    mfa_token = StringField('MFA Token', validators=[DataRequired(), Length(min=6, max=6)])
-    remember_me = BooleanField('Remember Me')
-    secret_key = HiddenField()
-
-    submit = SubmitField('Submit')
 
