@@ -116,22 +116,26 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
     mfa_secret_key = db.Column(db.String(16)) #field for key
+    mfa_enabled = db.Column(db.Boolean, default=False)
+
+    def get_mfa_secret(self):
+        return self.mfa_secret_key
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
     
     # definitions for mfa
-    def __init__(self, **kwargs):
-        super(User, self).__init__(**kwargs)
-        if self.mfa_secret_key is None:
-            self.mfa_secret_key = base64.b32encode(os.urandom(10)).decode('utf-8')
-    
-    def get_totp_uri(self):
-        return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo' \
-            .format(self.username, self.mfa_token)
+   # def __init__(self, **kwargs):
+    #    super(User, self).__init__(**kwargs)
+     #   self.mfa_enabled = None
 
-    def verify_totp(self, token):
-        return onetimepass.valid_totp(token, self.mfa_token)
+
+ #   def get_totp_uri(self):
+  #      return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo' \
+   #         .format(self.username, self.mfa_token)
+
+    #def verify_totp(self, token):
+     #   return onetimepass.valid_totp(token, self.mfa_token)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

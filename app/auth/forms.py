@@ -45,3 +45,9 @@ class ResetPasswordForm(FlaskForm):
         _l('Repeat Password'), validators=[DataRequired(),
                                            EqualTo('password')])
     submit = SubmitField(_l('Request Password Reset'))
+
+
+class MFAForm(FlaskForm):
+    mfa_token = StringField('MFA Token', validators=[DataRequired(), Length(min=6, max=6)])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Submit')
