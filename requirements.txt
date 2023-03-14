@@ -44,6 +44,14 @@ visitor==0.1.3
 Werkzeug==2.0.1
 WTForms==2.3.3
 
+# requirements for qrcode
+qrcode==7.4.2
+Pillow==9.4.0
+pyotp==2.8.0
+bcrypt==4.0.1
+onetimepass==1.0.1
+PyQRCode==1.2.1
+
 # requirements for Heroku
 #psycopg2==2.9.1
 #gunicorn==20.1.0

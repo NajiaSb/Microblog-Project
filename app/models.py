@@ -12,6 +12,8 @@ import redis
 import rq
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
+import onetimepass
+import pyqrcode
 
 
 class SearchableMixin(object):
@@ -94,6 +96,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    # mfa_token = db.Column(db.String(16)) #new database column for mfa
     posts = db.relationship('Post', backref='author', lazy='dynamic')
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
@@ -114,15 +117,34 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    otp_secret = db.Column(db.String(16))
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.otp_secret is None:
+            # generate a random secret
+            self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
+
+    @property
+    def password(self):
+        raise AttributeError('password is not a readable attribute')
+
+    @password.setter
+    def password(self, password):
+        self.password_hash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
+    def get_totp_uri(self):
+        return 'otpauth://totp/2FA-Demo:{0}?secret={1}&issuer=2FA-Demo' \
+            .format(self.username, self.otp_secret)
+
+    def verify_totp(self, token):
+        return onetimepass.valid_totp(token, self.otp_secret)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
-
-    def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
-
-    def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
 
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
@@ -144,7 +166,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     def followed_posts(self):
         followed = Post.query.join(
             followers, (followers.c.followed_id == Post.user_id)).filter(
-                followers.c.follower_id == self.id)
+            followers.c.follower_id == self.id)
         own = Post.query.filter_by(user_id=self.id)
         return followed.union(own).order_by(Post.timestamp.desc())
 
