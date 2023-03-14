@@ -9,7 +9,7 @@ Feature: Microblog User Registration
         And the first user enters "Password1@" in the password field
         And the first user enters "Password1@" in the repeat password field
         And the first user clicks the "Submit" button
-        Then the first user is redirected to login page
+        Then the first user is redirected to mfa page
 
     Scenario: Unsuccessful Registration with Missing Capital Letter
         Given the second user is on the Registration page

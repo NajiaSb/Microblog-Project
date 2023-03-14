@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 def open_browser(context):
     context.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
     context.driver.implicitly_wait(5)
-    context.driver.get("http://127.0.0.1:5001/auth/register")
+    context.driver.get("http://127.0.0.1:5000/auth/register")
 
 @when('the fourth user enters "{username}" in the username field')
 def step_impl(context, username):

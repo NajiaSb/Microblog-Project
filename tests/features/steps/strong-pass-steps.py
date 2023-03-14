@@ -11,7 +11,7 @@ from selenium.common.exceptions import TimeoutException
 def open_browser(context):
     context.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
     context.driver.implicitly_wait(5)
-    context.driver.get("http://127.0.0.1:5001/auth/register")
+    context.driver.get("http://127.0.0.1:5000/auth/register")
 
 @when('the first user enters "{username}" in the username field')
 def step_impl(context, username):
@@ -40,9 +40,9 @@ def step_impl(context):
     context.driver.implicitly_wait(5)
 
 
-@then('the first user is redirected to login page')
+@then('the first user is redirected to mfa page')
 def step_impl(context):
-    expected_url = "http://127.0.0.1:5001/auth/login"
+    expected_url = "http://127.0.0.1:5000/auth/twofactor"
     wait = WebDriverWait(context.driver, 10)
     try:
         wait.until(lambda driver: driver.current_url == expected_url)
