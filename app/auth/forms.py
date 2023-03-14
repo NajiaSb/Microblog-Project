@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, HiddenField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Required
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Required, Regexp
 from flask_babel import _, lazy_gettext as _l
 from app.models import User
 
@@ -16,7 +16,9 @@ class LoginForm(FlaskForm):
 class RegistrationForm(FlaskForm):
     username = StringField(_l('Username'), validators=[DataRequired()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired()])
+    password = PasswordField(_l('Password'), validators=[ DataRequired(),
+        Regexp('^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+        message="Passwords must be at least 8 characters and contain at least one capital letter, one number, and one special character (@$!%*?&). Passwords are case sensitive.")])
     password2 = PasswordField(
         _l('Repeat Password'), validators=[DataRequired(),
                                            EqualTo('password')])
