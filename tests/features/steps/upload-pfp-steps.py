@@ -15,17 +15,19 @@ def open_browser(context):
     context.driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
     context.driver.implicitly_wait(5)
     context.driver.get("http://127.0.0.1:5000/auth/login")
-    title_field = context.driver.find_element(By.ID, "username")
-    title_field.send_keys("testPfp")
-    title_field = context.driver.find_element(By.ID, "password")
-    title_field.send_keys("Password1@")
+    username_field = context.driver.find_element(By.ID, "username")
+    username_field.send_keys("testcase12")
+    pass_field = context.driver.find_element(By.ID, "password")
+    pass_field.send_keys("Password1@")
+    token_field = context.driver.find_element(By.ID, "token")
+    token_field.send_keys("101575")
     add_button = context.driver.find_element(By.ID, "submit")
     add_button.click()
     context.driver.implicitly_wait(100)
 
 @when(u'the user is on the "Edit Profile" page')
 def step_impl(context):
-    expected_url = "http://127.0.0.1:5000/index"
+    expected_url = "http://127.0.0.1:5000/auth/index"
     wait = WebDriverWait(context.driver, 10)
     try:
         wait.until(lambda driver: driver.current_url == expected_url)

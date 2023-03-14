@@ -26,14 +26,14 @@ def index():
 def login():
     if current_user.is_authenticated:
         # if user is logged in we get out of here
-        return redirect(url_for('index'))
+        return redirect(url_for('auth.index'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.verify_password(form.password.data) or \
                 not user.verify_totp(form.token.data):
             flash('Invalid username, password or token.')
-            return redirect(url_for('login'))
+            return redirect(url_for('auth.login'))
 
         # log user in
         login_user(user)
