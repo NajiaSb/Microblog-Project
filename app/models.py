@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from hashlib import md5
 import json
 import os
+import io
 from time import time
 from flask import current_app, url_for
 from flask_login import UserMixin
@@ -10,11 +11,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import redis
 import rq
+import secrets
 from app import db, login
 from app.search import add_to_index, remove_from_index, query_index
 import onetimepass
 import pyqrcode
-
+from os.path import join, dirname, realpath
 
 class SearchableMixin(object):
     @classmethod
@@ -83,13 +85,11 @@ class PaginatedAPIMixin(object):
         }
         return data
 
-
 followers = db.Table(
     'followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
 )
-
 
 class User(UserMixin, PaginatedAPIMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -102,6 +102,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
+    profile_picture = db.Column(db.String(140), default='default.jpg')
     followed = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -118,13 +119,12 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
                                     lazy='dynamic')
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
     otp_secret = db.Column(db.String(16))
-
+    
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.otp_secret is None:
             # generate a random secret
             self.otp_secret = base64.b32encode(os.urandom(10)).decode('utf-8')
-
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -150,6 +150,26 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(
             digest, size)
+
+    # new function to save pfp
+    def save_profile_picture(self, pic_data):
+        new_image_name = self.username + ".jpg"
+        UPLOADS_PATH = join(dirname(realpath(__file__)), 'static/profile_pictures')
+        picture_path = join(UPLOADS_PATH, new_image_name)
+
+        if not os.path.exists(UPLOADS_PATH):
+                os.makedirs(UPLOADS_PATH)
+
+        with open(picture_path, "wb") as f:
+            f.write(pic_data)
+        self.profile_picture = new_image_name
+        return True
+    
+    # new function to display pfp
+    def get_profile_picture(self):
+        picture_path = os.path.join('../static/profile_pictures', self.profile_picture)
+        return picture_path
+    
 
     def follow(self, user):
         if not self.is_following(user):
@@ -231,7 +251,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
         return data
 
     def from_dict(self, data, new_user=False):
-        for field in ['username', 'email', 'about_me']:
+        for field in ['username', 'email', 'about_me', 'profile_picture']:
             if field in data:
                 setattr(self, field, data[field])
         if new_user and 'password' in data:
