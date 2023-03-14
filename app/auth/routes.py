@@ -1,6 +1,7 @@
 import pyqrcode
 from flask import render_template, redirect, url_for, flash, request, session, app, abort
 from flask_mail import Message
+from werkzeug.security import generate_password_hash
 from werkzeug.urls import url_parse
 from flask_login import login_user, logout_user, current_user, login_required
 from flask_babel import _
@@ -118,18 +119,11 @@ def reset_password_request():
             # generate a token for the password reset link
             token = user.get_reset_password_token()
 
-            # compose the email message
-            msg = Message('Reset Your Password', recipients=[user.email])
-            msg.body = f'''To reset your password, click on the following link:
-{url_for('auth.reset_password', token=token, _external=True)}
+            # output the reset link to std_out
+            print(
+                f'To reset your password, click on the following link: {url_for("auth.reset_password", token=token,_external=True)}')
 
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
-
-            # send the email
-            mail.send(msg)
-
-            flash(_('Check your email for the instructions to reset your password'))
+            flash(_('Console Output has your reset link!'))
         else:
             flash(_('Invalid email address'))
         return redirect(url_for('auth.login'))
@@ -146,8 +140,13 @@ def reset_password(token):
         return redirect(url_for('main.index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        user.set_password(form.password.data)
-        db.session.commit()
-        flash(_('Your password has been reset.'))
+        if not user.verify_password(form.password.data):
+            user.password = form.password.data
+            db.session.commit()
+            flash(_('Your password has been reset.'))    #compare hash and if pass is diff reset it 
+        else:
+            flash(_('Your new password cannot be the same as your old password.'))
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
+
+

@@ -14,6 +14,7 @@ from redis import Redis
 import rq
 from config import Config
 from flask_wtf.csrf import CSRFProtect
+
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
@@ -27,8 +28,8 @@ babel = Babel()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
-    app.config.from_object(config_class)
 
+    app.config.from_object(config_class)
     db.init_app(app)
     migrate.init_app(app, db)
     login.init_app(app)
@@ -41,6 +42,13 @@ def create_app(config_class=Config):
     app.redis = Redis.from_url(app.config['REDIS_URL'])
     app.task_queue = rq.Queue('microblog-tasks', connection=app.redis)
     csrf = CSRFProtect(app)
+
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 465
+    app.config['MAIL_USERNAME'] = 'microbloghelpdesk@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'COMP4110@'
+    app.config['MAIL_USE_TLS'] = False
+    app.config['MAIL_USE_SSL'] = True
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
