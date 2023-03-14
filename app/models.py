@@ -140,6 +140,7 @@ class User(UserMixin, PaginatedAPIMixin, db.Model):
         self.profile_picture = new_image_name
         return True
     
+    # new function to display pfp
     def get_profile_picture(self):
         picture_path = os.path.join('../static/profile_pictures', self.profile_picture)
         return picture_path
