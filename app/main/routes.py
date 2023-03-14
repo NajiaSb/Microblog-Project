@@ -2,15 +2,19 @@ from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request, g, \
     jsonify, current_app
 from flask_login import current_user, login_required
+import os
+from os.path import join, dirname, realpath
 from flask_babel import _, get_locale
 from langdetect import detect, LangDetectException
 from app import db
 from app.main.forms import EditProfileForm, EmptyForm, PostForm, SearchForm, \
     MessageForm
 from app.models import User, Post, Message, Notification
+from werkzeug.utils import secure_filename
 from app.translate import translate
 from app.main import bp
 
+UPLOADS_PATH = join(dirname(realpath(__file__)), 'static/profile_pictures')
 
 @bp.before_app_request
 def before_request():
@@ -98,6 +102,13 @@ def edit_profile():
     if form.validate_on_submit():
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
+        if form.profile_picture.data:
+            # handle file upload and store in database
+            file = form.profile_picture.data
+            filename = secure_filename(file.filename)
+            extension = os.path.splitext(filename)[1]
+            file_data = file.read()
+            bool = current_user.save_profile_picture(file_data)
         db.session.commit()
         flash(_('Your changes have been saved.'))
         return redirect(url_for('main.edit_profile'))
