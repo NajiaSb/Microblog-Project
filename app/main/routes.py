@@ -59,6 +59,7 @@ def delete(id):
     post = Post.query.filter_by(id=id).first_or_404()
     db.session.delete(post)
     db.session.commit()
+    return redirect(url_for('main.index'))
 
 @bp.route('/explore')
 @login_required
