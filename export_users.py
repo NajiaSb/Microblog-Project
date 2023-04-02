@@ -10,7 +10,7 @@ users_table = 'user'
 conn = sqlite3.connect(db_path)
 cursor = conn.cursor()
 
-cursor.execute(f'SELECT username, password_hash, otp_secret FROM {users_table}')
+cursor.execute(f'SELECT username, password_hash, token FROM {users_table}')
 rows = cursor.fetchall()
 
 with open(csv_file, 'w', newline='') as csvfile:
