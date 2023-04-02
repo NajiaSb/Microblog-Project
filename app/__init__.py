@@ -97,8 +97,6 @@ def create_app(config_class=Config):
         app.logger.setLevel(logging.INFO)
         app.logger.info('Microblog startup')
 
-        app.config['HOST'] = '0.0.0.0'
-
     return app
 
 
@@ -108,8 +106,4 @@ def get_locale():
 
 
 from app import models
-
-if __name__ == '__main__':
-    app = create_app()
-    app.run(host=app.config['HOST'])
 

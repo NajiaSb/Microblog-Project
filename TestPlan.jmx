@@ -21,7 +21,7 @@
         <stringProp name="ThreadGroup.num_threads">200</stringProp>
         <stringProp name="ThreadGroup.ramp_time">200</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
-        <stringProp name="ThreadGroup.duration">60</stringProp>
+        <stringProp name="ThreadGroup.duration">3600</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
       </ThreadGroup>
@@ -56,7 +56,7 @@
                 </elementProp>
               </collectionProp>
             </elementProp>
-            <stringProp name="HTTPSampler.domain">192.168.50.227</stringProp>
+            <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
             <stringProp name="HTTPSampler.port">5000</stringProp>
             <stringProp name="HTTPSampler.protocol">http</stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
@@ -109,7 +109,7 @@
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
-                <stringProp name="HTTPSampler.domain">192.168.50.227</stringProp>
+                <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
                 <stringProp name="HTTPSampler.port">5000</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
                 <stringProp name="HTTPSampler.contentEncoding"></stringProp>
@@ -141,7 +141,7 @@
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
-                <stringProp name="HTTPSampler.domain">192.168.50.227</stringProp>
+                <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
                 <stringProp name="HTTPSampler.port">5000</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
                 <stringProp name="HTTPSampler.contentEncoding"></stringProp>
@@ -173,7 +173,7 @@
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
                 </elementProp>
-                <stringProp name="HTTPSampler.domain">192.168.50.227</stringProp>
+                <stringProp name="HTTPSampler.domain">127.0.0.1</stringProp>
                 <stringProp name="HTTPSampler.port">5000</stringProp>
                 <stringProp name="HTTPSampler.protocol">http</stringProp>
                 <stringProp name="HTTPSampler.contentEncoding"></stringProp>
