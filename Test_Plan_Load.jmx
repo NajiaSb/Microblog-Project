@@ -77,8 +77,8 @@
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
-        <stringProp name="ThreadGroup.num_threads">500</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">1000</stringProp>
+        <stringProp name="ThreadGroup.num_threads">200</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">200</stringProp>
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
         <stringProp name="ThreadGroup.duration">3600</stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
@@ -314,7 +314,7 @@
               <connectTime>true</connectTime>
             </value>
           </objProp>
-          <stringProp name="filename">/Users/nikolabaic/Documents/test_results.jtl</stringProp>
+          <stringProp name="filename">/Users/nikolabaic/Documents/test_results_stress.jtl</stringProp>
         </ResultCollector>
         <hashTree/>
         <ResultCollector guiclass="StatVisualizer" testclass="ResultCollector" testname="Aggregate Report" enabled="true">
@@ -402,7 +402,7 @@
         <stringProp name="HTTPSampler.contentEncoding"></stringProp>
         <stringProp name="HTTPSampler.path"></stringProp>
         <stringProp name="HTTPSampler.concurrentPool">6</stringProp>
-        <stringProp name="HTTPSampler.connect_timeout">2000</stringProp>
+        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
         <stringProp name="HTTPSampler.response_timeout"></stringProp>
       </ConfigTestElement>
       <hashTree/>
@@ -440,7 +440,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/Users/nikolabaic/Documents/test_results.jtl</stringProp>
+        <stringProp name="filename">/Users/nikolabaic/Documents/test_results_stress.jtl</stringProp>
       </ResultCollector>
       <hashTree/>
       <kg.apc.jmeter.vizualizers.CorrectedResultCollector guiclass="kg.apc.jmeter.vizualizers.ThreadsStateOverTimeGui" testclass="kg.apc.jmeter.vizualizers.CorrectedResultCollector" testname="jp@gc - Active Threads Over Time" enabled="true">
@@ -477,7 +477,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/Users/nikolabaic/Documents/test_results.jtl</stringProp>
+        <stringProp name="filename">/Users/nikolabaic/Documents/test_results_stress.jtl</stringProp>
         <longProp name="interval_grouping">500</longProp>
         <boolProp name="graph_aggregated">false</boolProp>
         <stringProp name="include_sample_labels"></stringProp>
@@ -522,7 +522,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/Users/nikolabaic/Documents/test_results.jtl</stringProp>
+        <stringProp name="filename">/Users/nikolabaic/Documents/test_results_stress.jtl</stringProp>
         <longProp name="interval_grouping">500</longProp>
         <boolProp name="graph_aggregated">false</boolProp>
         <stringProp name="include_sample_labels"></stringProp>
@@ -534,7 +534,7 @@
       </kg.apc.jmeter.vizualizers.CorrectedResultCollector>
       <hashTree/>
       <ResultCollector guiclass="TableVisualizer" testclass="ResultCollector" testname="View Results in Table" enabled="true">
-        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <boolProp name="ResultCollector.error_logging">true</boolProp>
         <objProp>
           <name>saveConfig</name>
           <value class="SampleSaveConfiguration">
@@ -567,7 +567,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/Users/nikolabaic/Documents/test_results.jtl</stringProp>
+        <stringProp name="filename">/Users/nikolabaic/Documents/test_results_stress.jtl</stringProp>
       </ResultCollector>
       <hashTree/>
       <ResultCollector guiclass="RespTimeGraphVisualizer" testclass="ResultCollector" testname="Response Time Graph" enabled="true">
@@ -604,7 +604,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">/Users/nikolabaic/Documents/test_results.jtl</stringProp>
+        <stringProp name="filename">/Users/nikolabaic/Documents/test_results_stress.jtl</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
