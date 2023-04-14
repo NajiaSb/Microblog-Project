@@ -1,7 +1,8 @@
 import json
 import sys
 import time
-from flask import render_template
+from datetime import datetime
+from flask import render_template, send_file, make_response
 from rq import get_current_job
 from app import create_app, db
 from app.models import User, Post, Task
@@ -10,7 +11,7 @@ from app.email import send_email
 app = create_app()
 app.app_context().push()
 
-
+ 
 def _set_task_progress(progress):
     job = get_current_job()
     if job:
@@ -27,16 +28,22 @@ def _set_task_progress(progress):
 def export_posts(user_id):
     try:
         user = User.query.get(user_id)
+        filename = "app/static/" + user.username + "-exported-posts.txt"
+        f = open(filename, "w")
         _set_task_progress(0)
         data = []
         i = 0
         total_posts = user.posts.count()
         for post in user.posts.order_by(Post.timestamp.asc()):
+            f.write(post.body)
+            f.write(" : Written on ")
+            f.write(post.timestamp.isoformat() + 'Z')
+            f.write("\n")
             data.append({'body': post.body,
                          'timestamp': post.timestamp.isoformat() + 'Z'})
-            time.sleep(5)
             i += 1
             _set_task_progress(100 * i // total_posts)
+        f.close()
 
         send_email('[Microblog] Your blog posts',
                 sender=app.config['ADMINS'][0], recipients=[user.email],
@@ -46,6 +53,7 @@ def export_posts(user_id):
                 attachments=[('posts.json', 'application/json',
                               json.dumps({'posts': data}, indent=4))],
                 sync=True)
+        
     except:
         _set_task_progress(100)
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
