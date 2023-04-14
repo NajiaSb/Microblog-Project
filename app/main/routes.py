@@ -53,6 +53,13 @@ def index():
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url)
 
+@bp.route('/delete/<id>', methods=['POST'])
+@login_required
+def delete(id):
+    post = Post.query.filter_by(id=id).first_or_404()
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(request.referrer)
 
 @bp.route('/explore')
 @login_required
