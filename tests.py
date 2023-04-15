@@ -1,13 +1,18 @@
 #!/usr/bin/env python
+import os
+import shutil
 from datetime import datetime, timedelta
 import unittest
+from io import BytesIO
 
 import onetimepass
+from PIL import Image
 
 from app import create_app, db
 from app.models import User, Post
 from config import Config
 from app.auth.forms import LoginForm
+from os.path import join, dirname, realpath
 
 
 class TestConfig(Config):
@@ -22,7 +27,6 @@ class UserModelCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
-        # adding the following for testing methods
         self.user = User(username='test_user', email='test_user@example.com')
         self.user.password = 'password'
         self.user.token = 'test_token'
@@ -30,10 +34,21 @@ class UserModelCase(unittest.TestCase):
         db.session.add(self.user)
         db.session.commit()
 
+        #sample image for testing
+        img = Image.new('RGB', (60, 30), color='red')
+        img_byte_arr = BytesIO()
+        img.save(img_byte_arr, format='JPEG')
+        self.sample_image_data = img_byte_arr.getvalue()
+
     def tearDown(self):
         db.session.remove()
         db.drop_all()
         self.app_context.pop()
+
+        # Remove the static/profile_pictures folder used for testing
+        UPLOADS_PATH = join(dirname(realpath(__file__)), 'app', 'static', 'profile_pictures')
+        if os.path.exists(UPLOADS_PATH):
+            shutil.rmtree(UPLOADS_PATH)
 
     def test_password_hashing(self):
         u = User(username='tester')
@@ -136,6 +151,28 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(f2, [p2, p3])
         self.assertEqual(f3, [p3, p4])
         self.assertEqual(f4, [p4])
+
+    def test_save_profile_picture(self):
+
+        result = self.user.save_profile_picture(self.sample_image_data)
+        self.assertTrue(result)
+
+        # assert profile picture is saved with the correct name
+        self.assertEqual(self.user.profile_picture, 'test_user.jpg')
+
+        # profile picture file exists in the static/profile_pictures folder
+        UPLOADS_PATH = join(dirname(realpath(__file__)), 'app', 'static', 'profile_pictures')
+        picture_path = join(UPLOADS_PATH, self.user.profile_picture)
+        self.assertTrue(os.path.exists(picture_path))
+
+    def test_get_profile_picture(self):
+
+        self.user.save_profile_picture(self.sample_image_data)
+
+        # getting the profile picture path
+        picture_path = self.user.get_profile_picture()
+        expected_path = os.path.join('../static/profile_pictures', 'test_user.jpg')
+        self.assertEqual(picture_path, expected_path)
 
 
 if __name__ == '__main__':
