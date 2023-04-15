@@ -1,7 +1,6 @@
 from datetime import datetime
-import time
 from flask import render_template, flash, redirect, url_for, request, g, \
-    jsonify, current_app, send_file
+    jsonify, current_app
 from flask_login import current_user, login_required
 import os
 from os.path import join, dirname, realpath
@@ -54,13 +53,6 @@ def index():
                            posts=posts.items, next_url=next_url,
                            prev_url=prev_url)
 
-@bp.route('/delete/<id>', methods=['POST'])
-@login_required
-def delete(id):
-    post = Post.query.filter_by(id=id).first_or_404()
-    db.session.delete(post)
-    db.session.commit()
-    return redirect(request.referrer)
 
 @bp.route('/explore')
 @login_required
@@ -91,7 +83,6 @@ def user(username):
     prev_url = url_for('main.user', username=user.username,
                        page=posts.prev_num) if posts.has_prev else None
     form = EmptyForm()
-    
     return render_template('user.html', user=user, posts=posts.items,
                            next_url=next_url, prev_url=prev_url, form=form)
 
@@ -234,18 +225,9 @@ def export_posts():
     if current_user.get_task_in_progress('export_posts'):
         flash(_('An export task is currently in progress'))
     else:
-        task = current_user.launch_task('export_posts', _('Exporting posts...'))
+        current_user.launch_task('export_posts', _('Exporting posts...'))
         db.session.commit()
-        time.sleep(2)
-        return redirect(url_for('main.download'))
-
     return redirect(url_for('main.user', username=current_user.username))
-
-@bp.route('/download')
-@login_required
-def download():
-    filename = "static/" + current_user.username +"-exported-posts.txt"
-    return send_file(filename, as_attachment=True)
 
 
 @bp.route('/notifications')
